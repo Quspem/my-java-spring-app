@@ -1,0 +1,36 @@
+[2026-09-12 08:23:26] server:started: Сервер запущен на порту 8080
+[2026-09-12 08:23:34] request:received: GET /favicon.ico
+[2026-09-12 08:23:37] request:received: GET /Student
+[2026-09-12 08:23:37] request:received: GET /favicon.ico
+[2026-09-12 08:23:56] request:received: GET /Student
+[2026-09-12 08:23:56] request:received: GET /favicon.ico
+[2026-09-12 08:25:21] server:started: Сервер запущен на порту 8080
+[2026-09-12 08:25:34] request:received: GET /Student
+[2026-09-12 08:25:34] request:received: GET /favicon.ico
+[2026-09-12 08:25:52] request:received: GET /test
+[2026-09-12 08:25:52] request:received: GET /favicon.ico
+[2026-09-12 08:26:03] request:received: GET /tdsa
+[2026-09-12 08:26:03] request:received: GET /favicon.ico
+[2026-09-12 08:26:08] request:received: GET /favicon.ico
+[2026-09-12 08:33:49] server:started: Сервер запущен на порту 8080
+[2026-09-12 08:33:57] request:received: GET /test
+[2026-09-12 08:33:57] request:received: GET /favicon.ico
+[2026-09-12 08:34:02] request:received: GET /stop
+[2026-09-12 08:34:02] request:received: GET /favicon.ico
+[2026-09-12 08:34:13] request:received: GET /stop
+[2026-09-12 08:34:14] request:received: GET /favicon.ico
+[2026-09-12 08:35:42] server:started: Сервер запущен на порту 8080
+[2026-09-12 08:35:50] server:stopped: Сервер остановлен
+[2026-09-12 08:36:51] server:started: Сервер запущен на порту 8080
+[2026-09-12 08:36:52] request:received: GET /Student
+[2026-09-12 08:36:52] request:received: GET /favicon.ico
+[2026-09-12 08:36:57] server:stopped: Сервер остановлен
+[2026-09-12 08:44:33] server:started: ������ ������� �� ����� 8080
+[2026-09-12 08:44:38] request:received: GET /Student
+[2026-09-12 08:44:38] request:received: GET /favicon.ico
+[2026-09-12 08:44:47] request:received: GET /stop
+[2026-09-12 08:44:47] request:received: GET /favicon.ico
+[2026-09-12 08:44:53] request:received: GET /stop
+[2026-09-12 08:44:53] request:received: GET /favicon.ico
+[2026-09-12 08:45:09] server:started: ������ ������� �� ����� 8080
+[2026-09-12 08:45:12] server:stopped: ������ ����������
