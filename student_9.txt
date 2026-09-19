@@ -1,0 +1,11 @@
+Student: Sytko Vadim
+Gruppa: 477
+Variant: 9
+Data: 2026-09-19 09:12:56
+Lyubimye knigi:
+1. "Po vtornikam s Morri" - Mitch Elbom
+2. "Atomnye privychki" - Dzhems Klir
+3. "Cherny lebed" - Nassim Nikolas Taleb
+4. "Dumay medlenno... reshay bystro" - Daniel' Kaneman
+5. "Chto-to tam" - komu-to len' vspominat'
+Kolichestvo zapisey: 10
