@@ -39,3 +39,27 @@
 [2026-09-15 08:46:06] request:received: GET /favicon.ico
 [2026-09-15 08:46:12] request:received: GET /favicon.ico
 [2026-09-15 08:46:18] request:received: GET /favicon.ico
+[2026-09-22 08:46:06] server:started: Сервер запущен на порту 8080
+[2026-09-22 08:46:54] request:received: GET /Student
+[2026-09-22 08:46:55] request:received: GET /favicon.ico
+[2026-09-22 08:46:58] request:received: GET /favicon.ico
+[2026-09-22 08:49:27] server:stopped: Сервер остановлен
+[2026-09-22 08:49:36] server:started: Сервер запущен на порту 8080
+[2026-09-22 08:49:45] request:received: GET /favicon.ico
+[2026-09-22 08:49:47] request:received: GET /favicon.ico
+[2026-09-22 08:49:47] request:received: GET /favicon.ico
+[2026-09-22 08:49:48] request:received: GET /favicon.ico
+[2026-09-22 08:49:48] request:received: GET /favicon.ico
+[2026-09-22 08:49:51] request:received: GET /favicon.ico
+[2026-09-22 08:50:01] server:stopped: Сервер остановлен
+[2026-09-22 08:50:06] server:started: Сервер запущен на порту 8080
+[2026-09-22 08:50:13] request:received: GET /favicon.ico
+[2026-09-22 08:50:13] request:received: GET /favicon.ico
+[2026-09-22 08:50:14] request:received: GET /favicon.ico
+[2026-09-22 08:50:14] request:received: GET /favicon.ico
+[2026-09-22 08:52:00] server:stopped: Сервер остановлен
+[2026-09-22 08:52:08] server:started: Сервер запущен на порту 8080
+[2026-09-22 08:52:14] request:received: GET /favicon.ico
+[2026-09-22 08:54:17] server:stopped: Сервер остановлен
+[2026-09-22 08:54:30] server:started: Сервер запущен на порту 8080
+[2026-09-22 08:59:44] server:stopped: Сервер остановлен

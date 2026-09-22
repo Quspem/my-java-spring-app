@@ -1,0 +1,45 @@
+### Базовый сервер
+GET http://localhost:8080/
+
+### Тест глобального обработчика ошибок
+GET http://localhost:8080/error-test
+
+### Защищенный маршрут БЕЗ заголовка
+GET http://localhost:8080/protected
+
+### Защищенный маршрут С заголовком
+GET http://localhost:8080/protected
+Authorization: Bearer secret-token-123
+
+### Получить список всех пользователей
+GET http://localhost:8080/api/users
+
+### Создать нового пользователя
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "name": "Сидоров Сидор",
+  "group": "477"
+}
+
+### Обновить данные пользователя
+PUT http://localhost:8080/api/users/1
+Content-Type: application/json
+
+{
+  "name": "Петров Петр",
+  "group": "478"
+}
+
+### Удалить пользователя
+DELETE http://localhost:8080/api/users/1
+
+### Получить всех студентов
+GET http://localhost:8080/students
+
+### Получить студентов из группы 477
+GET http://localhost:8080/students?group=477
+
+### Получить конкретного студента по ID = 1
+GET http://localhost:8080/students/1
