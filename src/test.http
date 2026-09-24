@@ -1,45 +1,71 @@
-### Базовый сервер
+### ========================================
+### ЗАДАНИЕ 1: Базовые HTML-страницы
+### ========================================
+
+### Главная страница со списком маршрутов
 GET http://localhost:8080/
 
-### Тест глобального обработчика ошибок
-GET http://localhost:8080/error-test
+### О разработчике
+GET http://localhost:8080/about
 
-### Защищенный маршрут БЕЗ заголовка
-GET http://localhost:8080/protected
+### Контакты
+GET http://localhost:8080/contacts
 
-### Защищенный маршрут С заголовком
-GET http://localhost:8080/protected
-Authorization: Bearer secret-token-123
 
-### Получить список всех пользователей
-GET http://localhost:8080/api/users
+### ========================================
+### ЗАДАНИЕ 2: Управление книгами (CRUD)
+### ========================================
 
-### Создать нового пользователя
-POST http://localhost:8080/api/users
+### 1. Получить весь список книг (по умолчанию там 1 тестовая книга)
+GET http://localhost:8080/api/books
+
+### 2. Добавить новую книгу (POST)
+POST http://localhost:8080/api/books
 Content-Type: application/json
 
 {
-  "name": "Сидоров Сидор",
-  "group": "477"
+  "title": "Преступление и наказание",
+  "author": "Достоевский",
+  "year": 1866
 }
 
-### Обновить данные пользователя
-PUT http://localhost:8080/api/users/1
+### 3. Поиск книг по автору
+GET http://localhost:8080/api/books/search?author=Достоевский
+
+### 4. Получить конкретную книгу по ID
+GET http://localhost:8080/api/books/1
+
+### 5. Обновить данные книги (PUT - меняем год издания у первой книги)
+PUT http://localhost:8080/api/books/1
 Content-Type: application/json
 
 {
-  "name": "Петров Петр",
-  "group": "478"
+  "title": "Война и мир",
+  "author": "Толстой",
+  "year": 2024
 }
 
-### Удалить пользователя
-DELETE http://localhost:8080/api/users/1
+### 6. Удалить книгу (ID = 1)
+DELETE http://localhost:8080/api/books/1
 
-### Получить всех студентов
-GET http://localhost:8080/students
 
-### Получить студентов из группы 477
-GET http://localhost:8080/students?group=477
+### ========================================
+### ЗАДАНИЕ 3: Обработка ошибок
+### ========================================
 
-### Получить конкретного студента по ID = 1
-GET http://localhost:8080/students/1
+### Тест синхронной ошибки (ожидаем статус 500 и JSON с текстом)
+GET http://localhost:8080/error
+
+### Тест асинхронной ошибки (ожидаем статус 500 и JSON с текстом)
+GET http://localhost:8080/async-error
+
+### Тест ошибки 404 (запрашиваем несуществующую книгу)
+GET http://localhost:8080/api/books/999
+
+### Тест ошибки 400 (отправляем POST без обязательных полей)
+POST http://localhost:8080/api/books
+Content-Type: application/json
+
+{
+  "title": "Книга без автора"
+}
