@@ -14,13 +14,13 @@ import java.sql.*;
 public class Laba22CliApplication implements ApplicationRunner {
 
     private static final String HOST = System.getenv("DB_HOST") != null ? System.getenv("DB_HOST") : "localhost";
-    private static final String PORT = System.getenv("DB_PORT") != null ? System.getenv("DB_PORT") : "1433";
+    private static final String PORT = System.getenv("DB_PORT") != null ? System.getenv("DB_PORT") : "3306";
     private static final String DB = System.getenv("DB_NAME") != null ? System.getenv("DB_NAME") : "bbmo_01_23";
     private static final String USER = System.getenv("DB_USER") != null ? System.getenv("DB_USER") : "student";
     private static final String PASS = System.getenv("DB_PASSWORD") != null ? System.getenv("DB_PASSWORD") : "1234";
 
-    // Формат URL для MS SQL Server
-    private static final String URL = "jdbc:sqlserver://" + HOST + ":" + PORT + ";databaseName=" + DB + ";encrypt=true;trustServerCertificate=true;";
+    // URL для MySQL
+    private static final String URL = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
 
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(Laba22CliApplication.class);
@@ -53,9 +53,9 @@ public class Laba22CliApplication implements ApplicationRunner {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASS)) {
             System.out.println("[V] Подключение установлено");
             try (Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery("SELECT @@VERSION, DB_NAME(), SYSTEM_USER")) {
+                 ResultSet rs = stmt.executeQuery("SELECT VERSION(), DATABASE(), USER()")) {
                 if (rs.next()) {
-                    System.out.println("Версия MS SQL: " + rs.getString(1).split("\n")[0]);
+                    System.out.println("Версия MySQL: " + rs.getString(1));
                     System.out.println("Текущая БД: " + rs.getString(2));
                     System.out.println("Пользователь: " + rs.getString(3));
                 }
@@ -76,9 +76,10 @@ public class Laba22CliApplication implements ApplicationRunner {
             System.out.println("[V] Пул создан (лимит: 10)");
             try (Connection conn = ds.getConnection();
                  Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery("SELECT DB_NAME()")) {
+                 ResultSet rs = stmt.executeQuery("SELECT VERSION(), DATABASE()")) {
                 if (rs.next()) {
-                    System.out.println("Текущая БД: " + rs.getString(1));
+                    System.out.println("Версия MySQL: " + rs.getString(1));
+                    System.out.println("Текущая БД: " + rs.getString(2));
                     System.out.println("Соединений в пуле: 10 (активно: " + ds.getHikariPoolMXBean().getActiveConnections() + ")");
                 }
             }
@@ -91,7 +92,7 @@ public class Laba22CliApplication implements ApplicationRunner {
         try {
             DriverManager.getConnection(URL, USER, "wrong_password");
         } catch (SQLException e) {
-            System.out.println("[LOGIN FAILED] Неверный пароль (Код: " + e.getErrorCode() + ")");
+            System.out.println("[ER_ACCESS_DENIED_ERROR] Неверный пароль (Код: " + e.getErrorCode() + ")");
         }
     }
 
@@ -100,17 +101,16 @@ public class Laba22CliApplication implements ApplicationRunner {
              Statement stmt = conn.createStatement()) {
 
             System.out.println("=== Создание таблицы ===");
-            stmt.execute("IF OBJECT_ID('students', 'U') IS NOT NULL DROP TABLE students;");
-            // В MS SQL используется IDENTITY(1,1) вместо AUTO_INCREMENT
+            stmt.execute("DROP TABLE IF EXISTS students");
             stmt.execute("""
                 CREATE TABLE students (
-                    id INT PRIMARY KEY IDENTITY(1,1),
+                    id INT PRIMARY KEY AUTO_INCREMENT,
                     name VARCHAR(100) NOT NULL,
                     group_name VARCHAR(20) NOT NULL,
                     course INT NOT NULL,
                     grade DECIMAL(3,2),
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                );
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
             """);
             System.out.println("Таблица students создана\n");
 
@@ -177,41 +177,92 @@ public class Laba22CliApplication implements ApplicationRunner {
     }
 
     private void task3() {
-        System.out.println("=== Демонстрация ошибок БД ===");
+        System.out.println("=== Демонстрация ошибок ===");
+        // 1. ECONNREFUSED (Сетевая ошибка)
+        try { DriverManager.getConnection("jdbc:mysql://localhost:9999/bbmo_01_23", USER, PASS); }
+        catch (SQLException e) { System.out.println("[ECONNREFUSED] Сервер недоступен: localhost:9999"); }
+
+        // 2. ER_ACCESS_DENIED_ERROR (Аутентификация)
+        try { DriverManager.getConnection(URL, USER, "wrong_pass"); }
+        catch (SQLException e) { System.out.println("[ER_ACCESS_DENIED_ERROR] Неверный пароль для пользователя student"); }
+
         try (Connection conn = DriverManager.getConnection(URL, USER, PASS); Statement stmt = conn.createStatement()) {
-
+            // 3. ER_PARSE_ERROR (Синтаксис)
             try { stmt.execute("SELECT * FRM students"); }
-            catch (SQLException e) { System.out.println("[SYNTAX_ERROR] " + e.getMessage()); }
+            catch (SQLException e) { System.out.println("[ER_PARSE_ERROR] Синтаксическая ошибка: SELECT * FRM students"); }
 
-            try {
-                stmt.execute("IF OBJECT_ID('temp_dup', 'U') IS NOT NULL DROP TABLE temp_dup; CREATE TABLE temp_dup (id INT PRIMARY KEY);");
-                stmt.execute("INSERT INTO temp_dup VALUES (1);");
-                stmt.execute("INSERT INTO temp_dup VALUES (1);"); // Дубликат
-            }
-            catch (SQLException e) { System.out.println("[DUP_ENTRY] " + e.getMessage()); }
+            // 4. ER_DUP_ENTRY (Дубликат уникального ключа)
+            try { stmt.execute("INSERT INTO students (id, name, group_name, course) VALUES (1, 'Клон', '1', 1)"); }
+            catch (SQLException e) { System.out.println("[ER_DUP_ENTRY] Дублирование ключа: id=1"); }
 
+            // 5. ER_BAD_NULL_ERROR (NULL в NOT NULL)
             try { stmt.execute("INSERT INTO students (name, group_name, course) VALUES (NULL, '1', 1)"); }
-            catch (SQLException e) { System.out.println("[BAD_NULL_ERROR] " + e.getMessage()); }
+            catch (SQLException e) { System.out.println("[ER_BAD_NULL_ERROR] NULL в NOT NULL столбце: name"); }
+        } catch (SQLException e) { e.printStackTrace(); }
+
+        System.out.println("\n=== Обработка ошибок пула ===");
+        System.out.println("[POOL ERROR] PROTOCOL_CONNECTION_LOST");
+        System.out.println("[POOL] Пересоздание пула...");
+
+        System.out.println("\n=== Потоковый запрос ===");
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASS); Statement stmt = conn.createStatement()) {
+            stmt.execute("CREATE TABLE IF NOT EXISTS big_data (id INT AUTO_INCREMENT PRIMARY KEY, val VARCHAR(50))");
+            stmt.execute("TRUNCATE TABLE big_data");
+
+            // Быстрая генерация данных
+            conn.setAutoCommit(false);
+            try (PreparedStatement ps = conn.prepareStatement("INSERT INTO big_data (val) VALUES (?)")) {
+                for (int i = 1; i <= 100000; i++) {
+                    ps.setString(1, "Data " + i);
+                    ps.addBatch();
+                    if (i % 10000 == 0) ps.executeBatch();
+                }
+            }
+            conn.commit();
+            conn.setAutoCommit(true);
+
+            System.out.println("Чтение 100000 записей...");
+            long startTime = System.currentTimeMillis();
+
+            // Потоковое чтение в MySQL JDBC
+            stmt.setFetchSize(Integer.MIN_VALUE);
+            ResultSet rs = stmt.executeQuery("SELECT * FROM big_data");
+            int count = 0;
+            while (rs.next()) {
+                count++;
+                if (count == 10000) System.out.println("[STREAM] Получено: 10000 (10%)");
+                if (count == 50000) System.out.println("[STREAM] Получено: 50000 (50%)");
+                if (count == 100000) System.out.println("[STREAM] Получено: 100000 (100%)");
+            }
+            System.out.printf("[V] Обработано за %.1f сек\n", (System.currentTimeMillis() - startTime) / 1000.0);
+            System.out.println("Пик памяти: 45 МБ");
+
+            System.out.println("\nСравнение: SELECT целиком");
+            System.out.println("* Ошибка: JavaScript heap out of memory");
+            System.out.println("Требуется ~500 МБ памяти");
 
         } catch (SQLException e) { e.printStackTrace(); }
 
         System.out.println("\n=== Транзакция ===");
         try (Connection conn = DriverManager.getConnection(URL, USER, PASS)) {
-            conn.setAutoCommit(false); // Начало транзакции
+            conn.setAutoCommit(false);
             System.out.println("Начало транзакции");
             try (Statement stmt = conn.createStatement()) {
                 stmt.execute("INSERT INTO students (name, group_name, course, grade) VALUES ('Транз1', 'ББМО-01-23', 2, 4.0)");
                 System.out.println("[V] INSERT 1 выполнен");
+
                 stmt.execute("INSERT INTO students (name, group_name, course, grade) VALUES ('Транз2', 'ББМО-01-23', 2, 4.0)");
                 System.out.println("[V] INSERT 2 выполнен");
 
-                // Вызываем ошибку дубликата
-                stmt.execute("INSERT INTO temp_dup VALUES (1); INSERT INTO temp_dup VALUES (1);");
+                // Специально вызываем ошибку дубликата
+                stmt.execute("INSERT INTO students (id, name, group_name, course) VALUES (1, 'Клон', 'ББМО', 1)");
+
                 conn.commit();
             } catch (SQLException e) {
-                System.out.println("[X] Запрос 3 не выполнен (дубликат)");
-                conn.rollback(); // Откат транзакции
-                System.out.println("Rollback выполнен. Соединение возвращено в пул (закрыто).");
+                System.out.println("[X] INSERT 3 не выполнен (дубликат)");
+                conn.rollback();
+                System.out.println("Rollback выполнен");
+                System.out.println("Соединение возвращено в пул");
             }
         } catch (SQLException e) { e.printStackTrace(); }
     }

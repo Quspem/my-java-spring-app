@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-	implementation 'com.microsoft.sqlserver:mssql-jdbc'
+	implementation 'com.mysql:mysql-connector-j'
 	implementation 'com.zaxxer:HikariCP'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
